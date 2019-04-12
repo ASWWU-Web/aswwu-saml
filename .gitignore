@@ -133,3 +133,7 @@ dmypy.json
 
 # VSCode
 .vscode
+
+# Settings files
+saml/settings.json
+saml/advanced_settings.json
