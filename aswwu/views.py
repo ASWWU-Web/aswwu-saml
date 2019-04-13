@@ -127,7 +127,8 @@ def index(request):
                 redir_url += req['get_data']['redirect']
             # create the redirect response and set the cookies in it
             response = HttpResponseRedirect(redir_url)
-            response.set_cookie('token', cookie_dict['token'], domain=cookie_dict['domain'], expires=cookie_dict['expires'], path=cookie_dict['path'])
+            response.set_cookie('token', cookie_dict['token'], domain=cookie_dict['domain'], expires=cookie_dict['expires'], path=cookie_dict['path'], samesite='Strict', secure=True, httponly=True)
+            response.set_cookie('loggedin', 'true', domain=cookie_dict['domain'], expires=cookie_dict['expires'], path=cookie_dict['path'], samesite='Strict', secure=True)
             return response
     # index page render
     return render(request, 'index.html', {'errors': errors, 'error_reason': error_reason, 'not_auth_warn': not_auth_warn, 'success_slo': success_slo,

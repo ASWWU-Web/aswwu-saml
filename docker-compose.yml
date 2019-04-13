@@ -7,9 +7,9 @@ services:
       - SAML_KEY
       - SAML_URL
       - SITE_URL
-    image: "aswwu/django-saml:${DJANGO_TAG}"
+    image: "aswwu/saml:${DJANGO_TAG}"
     build: .
-    container_name: django_saml
+    container_name: aswwu_saml
     volumes:
       - "${SAML_CERTS_DIR}:/home/django/django_server/saml/certs"
     restart: on-failure
