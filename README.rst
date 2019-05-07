@@ -90,3 +90,19 @@ Once you have setup you ``.env`` file, you can build and run the Docker containe
 
 Docker Compose can be install with apt if necessary.
 
+Debugging
++++++++++
+In the case of errors, there is a settings in ``saml/settings.json`` called ``debug`` that can be set to true. Once this is set, you can restart the server with:
+
+::
+
+  $ docker-compose restart
+
+Restarting the server will apply all new settings and certificates in the ``saml`` directory. You should now see debug messages if there are login issues.
+
+Certificate Maintenance
++++++++++++++++++++++++
+ADFS will eventually roll over their certificates, they will need to be updated in the ``saml/settings.json`` file. The certificates can be found in the `Federation Metadata <https://adfs.wallawalla.edu/FederationMetadata/2007-06/FederationMetadata.xml>`_ provided by the university. There is a section in the file call ``IDPSSODescriptor``, within this section there will be three ``KeyDescriptor`` sections containing the encryption certificate first and the two signing certificates next. These long lines are the certificates that can be added in the ``saml/settings.json`` file.
+
+Use the command in the Debugging section to restart the server and use the new certificates.
+
