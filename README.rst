@@ -1,6 +1,7 @@
 ASWWU SAML
 ----------
 The ASWWU SAML container used to authenticate students with the university login.
+The ASWWU SAML files are contined on the server in /data/aswwu-saml
 
 Endpoints
 =========
