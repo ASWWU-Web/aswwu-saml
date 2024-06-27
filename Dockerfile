@@ -1,6 +1,4 @@
-FROM python:3.7-alpine3.9
-
-MAINTAINER aswwu.webmaster@wallawalla.edu
+FROM python:3.12.3-alpine
 
 RUN apk add mariadb-dev pcre pcre-dev libxml2 xmlsec-dev && \
     apk add --no-cache --virtual .build-deps gcc libc-dev linux-headers libffi-dev libxslt-dev && \

@@ -7,10 +7,10 @@ verify_ssl = true
 pylint = "*"
 
 [packages]
-python3-saml = "~=1.6"
+python3-saml = "~=1.16"
 Django = "~=2.2"
 uwsgi = "*"
 requests = "*"
 
 [requires]
-python_version = "3.7"
+python_version = "3.12.3"
