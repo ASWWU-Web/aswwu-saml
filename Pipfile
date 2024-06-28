@@ -8,9 +8,10 @@ pylint = "*"
 
 [packages]
 python3-saml = "~=1.16"
-Django = "~=2.2"
+Django = "~=5.0.6"
 uwsgi = "*"
 requests = "*"
+django-tailwind = "*"
 
 [requires]
 python_version = "3.12.3"

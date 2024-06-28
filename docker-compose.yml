@@ -15,3 +15,14 @@ services:
     restart: always
     ports:
       - "${DJANGO_PORT}:8000"
+  # db:
+  #   image: mariadb:10.8
+  #   container_name: aswwu_db
+  #   environment:
+  #     - MYSQL_ROOT_PASSWORD
+  #     - MYSQL_DATABASE
+  #     - MYSQL_USER
+  #     - MYSQL_PASSWORD
+  #   volumes:
+  #     - "${DB_DIR}:/var/lib/mysql"
+  #   restart: always

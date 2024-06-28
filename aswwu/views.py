@@ -17,6 +17,24 @@ from onelogin.saml2.settings import OneLogin_Saml2_Settings
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
 
 
+def init_saml_auth(req):
+    auth = OneLogin_Saml2_Auth(req, custom_base_path=settings.SAML_FOLDER)
+    return auth
+
+
+def prepare_django_request(request):
+    # If server is behind proxys or balancers use the HTTP_X_FORWARDED fields
+    result = {
+        "https": "on" if request.is_secure() else "off",
+        "http_host": request.META["HTTP_HOST"],
+        "script_name": request.META["PATH_INFO"],
+        "get_data": request.GET.copy(),
+        # Uncomment if using ADFS as IdP, https://github.com/onelogin/python-saml/pull/144
+        # 'lowercase_urlencoding': True,
+        "post_data": request.POST.copy(),
+    }
+    return result
+
 def get_port(request):
     """
     Helper function to determine which port is used by the proxy when listening
@@ -39,17 +57,10 @@ def index(request):
     sent back to on aswwu.com.
     """
     # django request
-    req = {
-        'https': 'on' if request.is_secure() else 'off',
-        'http_host': request.META['HTTP_HOST'],
-        'script_name': request.META['PATH_INFO'],
-        'server_port': get_port(request),
-        'get_data': request.GET.copy(),
-        'lowercase_urlencoding': True,
-        'post_data': request.POST.copy()
-    }
+    req = prepare_django_request(request)
+    auth = init_saml_auth(req)
+
     # SAML auth object
-    auth = OneLogin_Saml2_Auth(req, custom_base_path=settings.SAML_FOLDER)
     # other attributes
     errors = []
     error_reason = None
@@ -60,23 +71,33 @@ def index(request):
 
     # single sign on
     if 'sso' in req['get_data']:
-        return_to = OneLogin_Saml2_Utils.get_self_url(req) + reverse('attrs')
         return_to = '/'
         if 'redirect' in req['get_data']:
             return_to += '?redirect={}'.format(req['get_data']['redirect'])
         return HttpResponseRedirect(auth.login(return_to=return_to))
     # single logout
     elif 'slo' in req['get_data']:
-        name_id = None
-        session_index = None
-        if 'samlNameId' in request.session:
-            name_id = request.session['samlNameId']
-        if 'samlSessionIndex' in request.session:
-            session_index = request.session['samlSessionIndex']
-        return HttpResponseRedirect(auth.logout(name_id=name_id, session_index=session_index))
+        name_id = session_index = name_id_format = name_id_nq = name_id_spnq = None
+        if "samlNameId" in request.session:
+            name_id = request.session["samlNameId"]
+        if "samlSessionIndex" in request.session:
+            session_index = request.session["samlSessionIndex"]
+        if "samlNameIdFormat" in request.session:
+            name_id_format = request.session["samlNameIdFormat"]
+        if "samlNameIdNameQualifier" in request.session:
+            name_id_nq = request.session["samlNameIdNameQualifier"]
+        if "samlNameIdSPNameQualifier" in request.session:
+            name_id_spnq = request.session["samlNameIdSPNameQualifier"]
+
+        return HttpResponseRedirect(auth.logout(name_id=name_id, session_index=session_index, nq=name_id_nq, name_id_format=name_id_format, spnq=name_id_spnq))
     # attribute consumer service
     elif 'acs' in req['get_data']:
-        auth.process_response()
+        request_id = None
+        if "AuthNRequestID" in request.session:
+            request_id = request.session["AuthNRequestID"]
+            
+        auth.process_response(request_id=request_id)
+        
         errors = auth.get_errors()
         not_auth_warn = not auth.is_authenticated()
 
